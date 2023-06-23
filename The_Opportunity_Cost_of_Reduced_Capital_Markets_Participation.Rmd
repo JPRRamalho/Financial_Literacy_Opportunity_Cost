@@ -1,16 +1,97 @@
 ---
-title: "The Opportunity Cost of Reduced Capital Markets Participation <br> Research Analysis"
+title: "Serious(ly,) Money for Thoughts"
 author: José Ramalho^[ISCTE Business School, NOVA National School of Public Health, jose_pedro_ramalho@iscte-iul.pt];
 date: "`r format(Sys.time(), '%d %B, %Y')`" 
 output:
   rmdformats::readthedown:
     use_bookdown: TRUE
     highlight: pygments
-    toc_depth: 6
-    code_folding: show
+    toc_depth: 2
+    toc_float: TRUE
+    number_sections: FALSE
+    code_folding: hide
     lightbox: TRUE
     gallery: TRUE
 ---
+
+```{css, echo=FALSE}
+
+#main .nav-pills > li.active > a,
+#main .nav-pills > li.active > a:hover,
+#main .nav-pills > li.active > a:focus {
+   background-color: #22983B;
+}
+
+#main .nav-pills > li > a:hover {
+  background-color: #008B8B;
+}
+
+h1,h2,h3,h4,h5,h6,legend{
+    color: #008B8B;
+}
+
+#nav-top span.glyphicon {
+  color: #008B8B;
+}
+
+#table-of-contents header{
+    color:#008B8B;
+    background-color: #008B8B;
+}
+
+#table-of-contents h2{
+    background-color:#22983B;
+}
+
+a:hover{
+    color:#008B8B
+}
+
+a:visited{
+    color:#008B8B
+}
+
+#sidebar {
+    color: #D9AB16;
+    background: #113458;
+}
+
+#sidebar h2 {
+    color: #FFFFFF;
+    background-color: #4096B8;
+}
+
+#sidebar a {
+    color: #FFFFFF;
+}
+
+#sidebar a:hover {
+    background-color: #4096B8;
+    color: #FFFFFF;
+}
+``` 
+
+```{css, echo=FALSE}
+#main a:link {
+  color: #5A7B9C;
+}
+
+/* visited link */
+#main a:visited {
+  color: #095484;
+}
+
+/* mouse over link */
+#main a:hover {
+  color: #8ebf42;
+}
+
+/* selected link */
+#main a:active {
+  color: #716464;
+}
+
+``` 
 
 ```{css, echo=FALSE}
 h1 {
@@ -18,7 +99,7 @@ h1 {
 }
 
     #content{
-        max-width:100%;
+        max-width:90%;
     }
     /* Adjust html width */
 ``` 
@@ -32,8 +113,14 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, error=TRUE)
 setwd("./")
 ```
 
-# Datasets Import 
-```{r}
+# The Opportunity Cost of Reduced Capital Markets Participation - A Short Analysis
+
+<p style="font-size: 13pt; line-height: 2em;" align="justify">The Portuguese government's recent changes to Treasury Certificates (1) have ignited a fierce and politically motivated debate about their purpose, consequences, and vested interests. Nevertheless, this public discourse is highly counterproductive and distracts us from far more important and pressing issues. Portugal ranks last in financial literacy of the general public among its Eurozone counterparts (2) and despite the advancement of new technologies and business models that have broadly increased access to capital markets participation through low-cost or no-fees brokerage services, internet-native and mobile platforms or fractional shares, only 9.22% of Portuguese households are invested in capital markets (3) (more recent studies found higher shares of participation – 52% - through the inclusion of government savings products (4)). From 1980 until 2020, households have had an average of 54.81% of their financial assets in cash and deposits (5). Despite a decreasing trend, 2021 46.54% share of cash and equivalents is considerably high.</p> 
+<p style="font-size: 13pt; line-height: 2em;" align="justify">To shed light on the opportunity cost of the low financial literacy of the Portuguese population and the resulting reduced capital markets participation, I calculated the missed potential gains from market participation between 2002 and 2021. Assuming a 20% cash balance as adequate and using Bank of Portugal Household Wealth Long Series data (5), a yearly household portfolio excess cash was computed. This excess cash was assumed to be invested in a traditional 60/40 portfolio. Portfolio components were the MSCI World net total return and Bloomberg Global Aggregate total return euro-denominated indexes to keep it diversified and coherent with the Portuguese households' conservative approach to investment (4). Since yearly returns were reinvested in the following years, and to keep the share of cash constant, only 80% of accumulated returns were assumed to be reinvested along with the respective year portfolio excess cash. All R code used to produce the results presented here is available on GitHub at: https://github.com/JPRRamalho/Financial_Literacy_Opportunity_Cost</p> 
+
+
+```{r, include=FALSE}
+## Datasets Import 
 library(readr)
 library(janitor)
 
@@ -55,10 +142,9 @@ Bloomberg_Global_Aggregate_Total_Return_Index_EUR <- read_delim("./Bloomberg_Glo
         Low = col_number(), Close = col_number()), 
     trim_ws = TRUE)
 Bloomberg_Global_Aggregate_Total_Return_Index_EUR <- clean_names(Bloomberg_Global_Aggregate_Total_Return_Index_EUR)
-```
 
-# Datasets Wrangling & Calculation
-```{r}
+
+## Datasets Wrangling & Calculation
 library(tidyr)
 library(dplyr)
 
@@ -116,10 +202,8 @@ Household_wealth_Bank_of_Portugal_Long_Series_EUR_2 <- Household_wealth_Bank_of_
            accumulate2(Household_wealth_Bank_of_Portugal_Long_Series_EUR_2$excess_cash, Household_wealth_Bank_of_Portugal_Long_Series_EUR_2$year_total_return, 
              .init = 0,
               ~ ..2*..3 + (..1*0.8*..3) + ..1)[-1])
-```
 
-# Data Analysis & Visualization
-```{r, fig.width=19, fig.height=15}
+## Data Analysis & Visualization
 library(PerformanceAnalytics)
 
 mean(Household_wealth_Bank_of_Portugal_Long_Series_EUR$percentage_cash_in_portfolio)
@@ -133,6 +217,7 @@ Household_wealth_Bank_of_Portugal_Long_Series_EUR_2 <- Household_wealth_Bank_of_
   mutate(year_total_return = year_total_return*100) %>% 
   mutate(periodo_de_referencia = format(as.Date(periodo_de_referencia, format="%Y/%m/%d"),"%Y"))
 
+
 library(ggplot2)
 library(tidyverse)
 library(tidyquant)
@@ -144,7 +229,7 @@ plot1 <- ggplot(data=Household_wealth_Bank_of_Portugal_Long_Series_EUR_2, aes(x=
   geom_col() +
   geom_text(aes(label = dollar(year_return_compounded_cummulative)), vjust = -1.5) +
   labs(x="Year") +
-  ggtitle("Potential Missed Cumulative Investment Returns")+
+  ggtitle("C  Potential Missed Cumulative Investment Returns")+
   theme_classic() +
     theme(text = element_text(size = 14),
           axis.text.y=element_blank(),
@@ -152,7 +237,7 @@ plot1 <- ggplot(data=Household_wealth_Bank_of_Portugal_Long_Series_EUR_2, aes(x=
           axis.title.y=element_blank(),
           axis.line.y = element_blank(),
           axis.text.x = element_text(angle = 60, hjust = 1),
-          plot.title = element_text(size=16, face="bold", hjust = 0.02))
+          plot.title = element_text(size=16, face="bold", hjust = 0.04))
 
 
 plot2 <- ggplot(data=Household_wealth_Bank_of_Portugal_Long_Series_EUR_2, aes(x=periodo_de_referencia))+
@@ -162,7 +247,7 @@ plot2 <- ggplot(data=Household_wealth_Bank_of_Portugal_Long_Series_EUR_2, aes(x=
   geom_hline(yintercept=0, linetype="dashed", color = "red")+
   scale_y_continuous(name = "%", breaks = c(-40,-35,-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30), labels = waiver())+
   labs(x="Year")+
-  ggtitle("Historical Portfolio Returns")+
+  ggtitle("B  Historical Portfolio Returns")+
   theme_bw()+
     theme(text = element_text(size = 14),
           axis.text.x = element_text(angle = 60, hjust = 1),
@@ -176,7 +261,7 @@ plot3 <- ggplot(data=Household_wealth_Bank_of_Portugal_Long_Series_EUR_2, aes(x=
    geom_point(aes(y=excess_cash_percentage, colour = "Annual Excess Cash Proportion of Total Finantial Assets"), size = 4)+
    scale_y_continuous(name = "%", breaks = c(0,5,10,15,20,25,30,35,40,45,50), labels = waiver())+
   labs(x="Year")+
-  ggtitle("Portfolio Cash Position")+
+  ggtitle("A  Portfolio Cash Position")+
   theme_bw()+
     theme(text = element_text(size = 16),
           axis.text.x = element_text(angle = 60, hjust = 1),
@@ -187,21 +272,50 @@ plot3 <- ggplot(data=Household_wealth_Bank_of_Portugal_Long_Series_EUR_2, aes(x=
 
 library(ggpubr)
 
-figure_1 <- ggarrange(plot1, 
-                      ggarrange(plot2, plot3, ncol = 2, labels = c("B", "C")), 
-                      nrow = 2,
-                      labels = "A")
+figure_1 <- ggarrange(ggarrange(plot3, plot2, ncol = 2), 
+                      plot1,
+                      nrow = 2)
 
 figure_1 <- annotate_figure(figure_1,
                 bottom = text_grob("Data sources: Bank of Portugal, YCharts.",
                                   hjust = 6.7, x = 1, face = "italic", size = 11))
+```
 
+<p style="font-size: 13pt; line-height: 2em;" align="justify">During this 20-year period, only between 2005 and 2008 did cash balances drop below 40% of households' total financial assets, with an increasing trend ever since (Figure 1A). Over the same period, the 60/40 portfolio yielded an annualized total return of 6.30%. The selected portfolio seems to have had adequate diversification showing only three years of negative returns (2002, 2008 and 2018) (Figure 1B). Figure 1C shows the missed potential cumulative returns over the years. Following the proposed allocation, the Portuguese population missed €181.89 billion in returns due to its low capital markets participation. The true magnitude of this number is better put into perspective by establishing some simple yet illuminating comparisons: €181.89 billion amounts to more than ten times the €16.6 billion of the Recovery and Resilience Facility earmarked for Portugal, 7.8 times the country’s €23.18 billion Social Security Financial Stabilization Fund, and more than 67% of Portugal’s gross debt (2021 numbers) (6,7).</p> 
+
+## Figure 1
+```{r, echo = FALSE, fig.width=19, fig.height=16}
 figure_1
 ```
 
-# Package References
-```{r}
+<p style="font-size: 13pt; line-height: 2em;" align="justify">Despite using net total return indexes to account for non-appreciation capital gains, country taxes on capital gains were ignored. Other limitations to this work such as the assumption of no additional wealth transfers to real estate assets or no returns on cash and deposits, should also be considered. The difficulty in assessing yearly returns on a bond portfolio of national treasuries (8) made it unfeasible to use a 60/40 national securities portfolio in this analysis.</p> 
+<p style="font-size: 13pt; line-height: 2em;" align="justify">Although ignoring the crucial issue of wealth distribution and equity, it seems evident that poor financial literacy bears a very high hidden opportunity cost which adds to other unmeasured consequences of many other suboptimal personal financial decisions. In fact, we could say that the lack of financial literacy cost Portuguese households at least €181.89 billion in the 20-year period of 2002-2021 (€17,454.03 per resident).</p>  
+<p style="font-size: 13pt; line-height: 2em;" align="justify">While advances have happened, a complete democratization of access to capital markets and wealth building will remain elusive and uneven, worsening the wealth gap as long as financial literacy is not a priority.</p> 
+
+
+## References
+<p style="font-size: 13pt; line-height: 2em;" align="justify"> 1.	Portaria n.o 149-A/2023 [Internet]. 149-A Jun 2, 2023. Available from: https://diariodarepublica.pt/dr/detalhe/portaria/149-a-2023-213940447 </p> 
+
+<p style="font-size: 13pt; line-height: 2em;" align="justify"> 2.	Gardt M, Angino S, Mee S, Glöckler G. ECB Communication with the wider public. 2022 Jan 12 [cited 2023 Jun 16]; Available from: https://www.ecb.europa.eu/pub/economic-bulletin/articles/2022/html/ecb.ebart202108_02~5c1e5a116d.en.html </p> 
+
+<p style="font-size: 13pt; line-height: 2em;" align="justify">3.	CMVM - O Perfil do Investidor Particular Português [Internet]. [cited 2023 Jun 16]. Available from: https://www.cmvm.pt/pt/EstatisticasEstudosEPublicacoes/Estudos/Pages/O%20Perfil%20do%20Investidor%20Particular%20Portugu%C3%AAs.aspx?v= </p> 
+
+<p style="font-size: 13pt; line-height: 2em;" align="justify"> 4.	Resultados do Inquérito Online ao Investidor 2018 [Internet]. CMVM; 2019 Apr [cited 2023 Jun 16]. Available from: https://www.cmvm.pt/pt/EstatisticasEstudosEPublicacoes/Estudos/Documents/Resultados%20Inquerito%20Online%20Perfil%20Investidor_2019.pdf </p> 
+
+<p style="font-size: 13pt; line-height: 2em;" align="justify"> 5.	Séries para a economia portuguesa – Património dos particulares [Internet]. BPstat. [cited 2023 Jun 16]. Available from: https://bpstat.bportugal.pt/conteudos/quadros/655 </p> 
+
+<p style="font-size: 13pt; line-height: 2em;" align="justify"> 6.	FUNDO DE ESTABILIZAÇÃO FINANCEIRA DA  SEGURANÇA SOCIAL - RELATÓRIO E CONTAS 2021 [Internet]. Porto: INSTITUTO DE GESTÃO DE FUNDOS DE CAPITALIZAÇÃO DA SEGURANÇA SOCIAL, I.P.; 2022 Mar [cited 2023 Jun 20]. Available from: https://www.seg-social.pt/documents/10152/438902/Rel_Ativ_FEFSS_2021/d21f2b3d-a77a-489d-a266-d37080ae7112 </p> 
+
+<p style="font-size: 13pt; line-height: 2em;" align="justify"> 7.	General Government: gross debt [Internet]. [cited 2023 Jun 20]. Available from: https://www.pordata.pt/en/portugal/general+government+gross+debt-2783 </p> 
+
+<p style="font-size: 13pt; line-height: 2em;" align="justify"> 8.	Janeiro F. The Portuguese Bond Index: A measure for bond portfolio performance. PORTUGUESE TREASURY AND DEBT MANAGEMENT AGENCY [Internet]. 2017 Sep 20 [cited 2023 Jun 20]; Available from: https://www.igcp.pt/fotos/editor2/2017/Estudos/The_Portuguese_Bond_Index_A_measure_for_bond_portfolio_performance.pdf </p> 
+
+
+## Package References
+```{r, echo=FALSE}
 library(report)
-cite_packages()
+cite_packages(
+  output = "paragraph",
+  out.format = "html")
 ```
 
