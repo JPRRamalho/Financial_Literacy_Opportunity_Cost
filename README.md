@@ -7,7 +7,7 @@ This analysis had no specific support or funding.
 <p align="justify">In these files, you will find some data wrangling, transformation, simple computation and visualization using R.
 
 Data Sources: [Bank of Portugal](https://bpstat.bportugal.pt/conteudos/quadros/655) and [YCharts](https://ycharts.com/indices/%5EMSWNTRL).
-The short paper will be available soon. </p> 
+You can read this short analysis on this repository's GitHub page. </p> 
 
 ### Running Instructions:
 <p align="justify">You can either run the R Scripts or R Markdown files directly from your CLI using the following commands:</p>
